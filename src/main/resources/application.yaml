@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: fin.whisper
+  # Activa hilos virtuales para no bloquear la CPU con Ollama
+  threads:
+    virtual:
+      enabled: true
+
+  ai:
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        options:
+          model: llama3.1:8b # Modelo Llama 3.1 de 8B parámetros
+          temperature: 0.1 # Baja temperatura para análisis financiero preciso
+
+    # Configuración del servidor MCP (Python)
+    mcp:
+      client:
+        enabled: true
+        sse:
+          connections:
+            quant-tools: # nombre debe coincidir
+              url: http://127.0.0.1:8000     # 👈 endpoint SSE del Python server
+
+
+logging:
+  level:
+    com.matb.demo: DEBUG  # Logging detallado para nuestro paquete
+    org.springframework.ai: DEBUG  # Logging de Spring AI
+    org.springframework.web: DEBUG  # Logging de Spring Web
+    org.springframework.ai.mcp: TRACE  # Logging detallado de MCP
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} %highlight(%-5level) [%thread] %cyan([%logger{36}]) - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/finwhisper.log
