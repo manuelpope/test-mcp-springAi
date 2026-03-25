@@ -11,18 +11,17 @@ spring:
       base-url: http://localhost:11434
       chat:
         options:
-          model: llama3.1:8b # Modelo Llama 3.1 de 8B parámetros
+          model: gpt-oss:20b # Modelo Llama 3.1 de 8B parámetros
           temperature: 0.1 # Baja temperatura para análisis financiero preciso
 
     # Configuración del servidor MCP (Python)
     mcp:
       client:
         enabled: true
-        sse:
+        streamable-http:
           connections:
-            quant-tools: # nombre debe coincidir
-              url: http://127.0.0.1:8000     # 👈 endpoint SSE del Python server
-
+            server1:
+              url: http://0.0.0.0:8000
 
 logging:
   level:

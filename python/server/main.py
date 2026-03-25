@@ -1,6 +1,12 @@
-from mcp.server.fastmcp import FastMCP
+from fastmcp import FastMCP
 import numpy as np
 import yfinance as yf
+import logging
+from services.research_news_web import get_news_headlines as fetch_news
+
+# Configurar logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 mcp = FastMCP("quant-tools")
 
@@ -18,15 +24,15 @@ def calculate_rsi(prices, period=14):
         avg_gain = (avg_gain * (period - 1) + up[i]) / period
         avg_loss = (avg_loss * (period - 1) + down[i]) / period
 
-    rs = avg_gain / (avg_loss + 1e-10) # Evitar división por cero
+    rs = avg_gain / (avg_loss + 1e-10)  # Evitar división por cero
     return 100 - (100 / (1 + rs))
 
 @mcp.tool()
 def get_advanced_stats(ticker: str) -> dict:
     stock = yf.Ticker(ticker)
-    hist = stock.history(period="6mo") # Necesitamos histórico para la media de 20 días
+    hist = stock.history(period="6mo")  # Necesitamos histórico para la media de 20 días
 
-    closes = hist['Close'].values
+    closes = hist["Close"].values
     last_20_days = closes[-20:]
 
     # Cálculos Bollinger con NumPy
@@ -42,9 +48,17 @@ def get_advanced_stats(ticker: str) -> dict:
         "bollinger_superior": float(upper_band),
         "bollinger_inferior": float(lower_band),
         "media_20": float(sma_20),
-        "volatilidad_anual": float(np.std(closes) * np.sqrt(252)) # Volatilidad anualizada
+        "volatilidad_anual": float(
+            np.std(closes) * np.sqrt(252)
+        ),  # Volatilidad anualizada
     }
-if __name__ == "__main__":
-    print("Starting MCP server on SSE mode...")
-    mcp.run(transport="sse")
 
+
+@mcp.tool()
+def get_news_headlines(ticker: str, limit: int = 10) -> dict:
+    return fetch_news(ticker, limit)
+
+
+if __name__ == "__main__":
+    print("Starting MCP server on http mode...")
+    mcp.run(transport="http", host="0.0.0.0", port=8000)

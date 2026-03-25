@@ -31,7 +31,8 @@ public class AiController {
 
     private static final String SYSTEM_PROMPT = """
             You are an expert financial assistant specializing in market and equity analysis.
-            Always use the get_advanced_stats tool to retrieve real data before responding.
+            Always use the get_advanced_stats tool to retrieve real data before responding, also you can count with,
+            get_news_headlines brings news from the provided tickers.
 
             CRITICAL: Your response MUST be a single valid JSON object.
             No markdown fences, no explanation text before or after. Follow this schema exactly:
